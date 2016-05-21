@@ -20,3 +20,9 @@ libraryDependencies ++= Seq(
   "com.typesafe.akka" %% "akka-http-core" % akkaVersion,
   "com.typesafe.akka" %% "akka-http-spray-json-experimental" % akkaVersion
 )
+
+val gitHeadCommitSha = settingKey[String]("Determines the current git commit SHA")
+gitHeadCommitSha := Process("git rev-parse HEAD").lines.head
+
+version in Docker := gitHeadCommitSha.value
+dockerRepository := Some("aggenebbisj")
