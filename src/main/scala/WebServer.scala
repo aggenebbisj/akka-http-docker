@@ -1,3 +1,5 @@
+import java.net.InetAddress
+
 import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.{ContentTypes, HttpEntity}
@@ -13,6 +15,11 @@ object WebServer {
     // needed for the future flatMap/onComplete in the end
     implicit val executionContext = system.dispatcher
 
+    // settings about bind host/port
+    // could be read from application.conf (via system.settings):
+    val localhost = InetAddress.getLocalHost
+    val interface = localhost.getHostAddress
+
     val route =
       path("hello") {
         get {
@@ -20,9 +27,9 @@ object WebServer {
         }
       }
 
-    val bindingFuture = Http().bindAndHandle(route, "localhost", 8080)
+    val bindingFuture = Http().bindAndHandle(route, interface, 8080)
 
-    println(s"Server online at http://localhost:8080/\nPress RETURN to stop...")
+    println(s"Server is online at http://$interface:8080/\nPress RETURN to stop...")
     StdIn.readLine() // let it run until user presses return
     bindingFuture
       .flatMap(_.unbind()) // trigger unbinding from the port
